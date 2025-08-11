@@ -111,6 +111,15 @@ const updateProfile = async (req, res) => {
   }
 };
 
+const checkAuth = async (req, res) => {
+  try {
+    res.status(200).json(req.user);
+  } catch (error) {
+    console.error("Error in checkAuth controller:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.find();
@@ -121,4 +130,11 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-module.exports = { signup, login, logout, getAllUsers, updateProfile };
+module.exports = {
+  signup,
+  login,
+  logout,
+  getAllUsers,
+  updateProfile,
+  checkAuth,
+};
