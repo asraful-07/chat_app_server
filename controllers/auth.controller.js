@@ -82,24 +82,32 @@ const logout = (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    const { profilePic } = req.body;
+    const { profilePic, fullName } = req.body;
     const userId = req.user._id;
 
-    if (!profilePic) {
-      return res.status(400).json({ message: "Profile picture is required" });
+    // Object to store fields to update
+    let updateData = {};
+
+    if (fullName && fullName.trim() !== "") {
+      updateData.fullName = fullName.trim();
     }
 
-    const uploadResponse = await cloudinary.uploader.upload(profilePic, {
-      folder: "profile_pics", // optional
-      overwrite: true,
-      resource_type: "image",
-    });
+    if (profilePic && profilePic.trim() !== "") {
+      const uploadResponse = await cloudinary.uploader.upload(profilePic, {
+        folder: "profile_pics",
+        overwrite: true,
+        resource_type: "image",
+      });
+      updateData.profilePic = uploadResponse.secure_url;
+    }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { profilePic: uploadResponse.secure_url },
-      { new: true }
-    ).select("-password");
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ message: "No data provided for update" });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
+      new: true,
+    }).select("-password");
 
     res.status(200).json({
       message: "Profile updated successfully",
