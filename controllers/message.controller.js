@@ -2,6 +2,7 @@ const User = require("../models/user.model");
 const Message = require("../models/message.model");
 const cloudinary = require("../lib/cloudinary");
 const { io, getReceiverSocketId } = require("../lib/socket");
+const streamifier = require("streamifier");
 
 const getUsersForSidebar = async (req, res) => {
   try {
@@ -35,24 +36,25 @@ const getMessage = async (req, res) => {
 
 const sendMessage = async (req, res) => {
   try {
-    const { text } = req.body; // multer text fields parse করে দিবে
+    const { text } = req.body;
     const { id: receiverId } = req.params;
     const senderId = req.user._id;
     let imageUrl = "";
 
     if (req.file) {
-      // Buffer থেকে cloudinary তে upload
-      const uploadResponse = await cloudinary.uploader.upload_stream(
-        { folder: "messages" },
-        (error, result) => {
-          if (error) {
-            console.error("Cloudinary upload error:", error);
-            return res.status(500).json({ message: "Image upload failed" });
+      // multer এর file buffer কে cloudinary তে upload
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "messages" },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
           }
-          imageUrl = result.secure_url;
-        }
-      );
-      uploadResponse.end(req.file.buffer);
+        );
+        streamifier.createReadStream(req.file.buffer).pipe(stream);
+      });
+
+      imageUrl = result.secure_url;
     }
 
     const newMessage = new Message({
