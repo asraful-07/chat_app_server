@@ -3,7 +3,7 @@ const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
 const connectDB = require("./lib/db");
 const authRoutes = require("./routes/auth.route");
-const messageRoutes = require("./routes/auth.route");
+const messageRoutes = require("./routes/message.route");
 const cors = require("cors");
 const { app, server } = require("./lib/socket");
 

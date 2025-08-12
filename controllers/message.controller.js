@@ -35,17 +35,24 @@ const getMessage = async (req, res) => {
 
 const sendMessage = async (req, res) => {
   try {
-    const { text, image } = req.body;
+    const { text } = req.body; // multer text fields parse করে দিবে
     const { id: receiverId } = req.params;
-
     const senderId = req.user._id;
-    let imageUrl;
+    let imageUrl = "";
 
-    if (image) {
-      const uploadResponse = await cloudinary.uploader.upload(image, {
-        folder: "messages",
-      });
-      imageUrl = uploadResponse.secure_url;
+    if (req.file) {
+      // Buffer থেকে cloudinary তে upload
+      const uploadResponse = await cloudinary.uploader.upload_stream(
+        { folder: "messages" },
+        (error, result) => {
+          if (error) {
+            console.error("Cloudinary upload error:", error);
+            return res.status(500).json({ message: "Image upload failed" });
+          }
+          imageUrl = result.secure_url;
+        }
+      );
+      uploadResponse.end(req.file.buffer);
     }
 
     const newMessage = new Message({
@@ -57,7 +64,6 @@ const sendMessage = async (req, res) => {
 
     await newMessage.save();
 
-    // ✅ রিয়েলটাইম পাঠানো
     const receiverSocketId = getReceiverSocketId(receiverId);
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("newMessage", newMessage);
