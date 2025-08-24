@@ -1,5 +1,16 @@
 node_modules
 .env
+.vercel
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -28,3 +39,4 @@ async function run() {
   }
 }
 run().catch(console.dir);
+
