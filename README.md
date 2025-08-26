@@ -188,7 +188,3 @@ npm run build && npm run start
 - **Parser:** `express.json`, `multer`
 - **Auth:** custom `verifyAccessToken`
 - **Validation:** `zod`/`joi` validators per route
-
----
-
-##
