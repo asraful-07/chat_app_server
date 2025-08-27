@@ -178,8 +178,6 @@ npm run build && npm run start
 }
 ```
 
----
-
 ## 🧰 Middlewares (Suggested)
 
 - **Security:** `helmet`, `cors({ origin: CLIENT_URL, credentials: true })`
