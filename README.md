@@ -154,7 +154,7 @@ yarn
 
 # 3) Env
 cp .env.example .env
-# .env এ আপনার মান বসান
+# .env
 
 # 4) Dev run (ts-node-dev / nodemon)
 npm run dev
