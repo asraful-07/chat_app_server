@@ -71,13 +71,12 @@ const login = async (req, res) => {
 };
 
 const logout = (req, res) => {
-  // Clear the JWT cookie
-  res.clearCookie("jwt", {
-    httpOnly: true,
-    sameSite: "strict",
-    secure: process.env.NODE_ENV !== "development",
-  });
-  res.status(200).json({ message: "Logged out successfully" });
+  try {
+    res.clearCookie("jwt", "", { maxAge: 0 });
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 const updateProfile = async (req, res) => {
